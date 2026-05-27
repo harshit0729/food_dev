@@ -78,7 +78,7 @@ const makeRequest = async (payload) => {
           headers: {
             'Authorization': `Bearer ${config.key}`,
             'Content-Type': 'application/json',
-            'HTTP-Referer': process.env.CLIENT_URL || 'http://localhost:3000',
+            'HTTP-Referer': process.env.CLIENT_URL || 'http://56.228.12.101:3000',
           },
           timeout: 15000,
         });
