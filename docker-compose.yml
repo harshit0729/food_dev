@@ -1,0 +1,50 @@
+version: "3.8"
+
+services:
+  mongodb:
+    image: mongo:7
+    container_name: foodflow-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - foodflow-network
+
+  server:
+    build:
+      context: .
+      dockerfile: server/Dockerfile
+    container_name: foodflow-server
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    depends_on:
+      - mongodb
+    env_file:
+      - .env
+    environment:
+      - MONGO_URI=mongodb://mongodb:27017/foodflow
+    networks:
+      - foodflow-network
+
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: foodflow-client
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    depends_on:
+      - server
+    networks:
+      - foodflow-network
+
+volumes:
+  mongodb_data:
+
+networks:
+  foodflow-network:
+    driver: bridge
