@@ -7,7 +7,7 @@ const dotenv = require('dotenv');
 const http = require('http');
 const { Server } = require('socket.io');
 
-dotenv.config({ path: './.env' });
+dotenv.config();
 
 const connectDB = require('./config/db');
 const errorHandler = require('./middleware/error');
@@ -24,9 +24,11 @@ const io = new Server(server, {
 });
 
 app.use(helmet());
-const allowedOrigins = (process.env.CLIENT_URL || 'http://localhost:3000').split(',').map((s) => s.trim());
 app.use(cors({
-  origin: (origin, cb) => { cb(null, !origin || allowedOrigins.includes(origin)); },
+  origin: [
+    "http://localhost:3000",
+    "http://56.228.12.101:3000"
+  ],
   credentials: true,
 }));
 app.use(express.json({ limit: '10mb' }));

@@ -1,50 +1,38 @@
-version: "3.8"
-
 services:
-  mongodb:
+  mongo:
     image: mongo:7
-    container_name: foodflow-mongodb
+    container_name: food-app-mongo
     restart: unless-stopped
     ports:
       - "27017:27017"
     volumes:
       - mongodb_data:/data/db
-    networks:
-      - foodflow-network
 
-  server:
-    build:
-      context: .
-      dockerfile: server/Dockerfile
-    container_name: foodflow-server
+  backend:
+    image: harshittjainn/backend:v3
+    container_name: food-app-backend
     restart: unless-stopped
     ports:
       - "5000:5000"
     depends_on:
-      - mongodb
-    env_file:
-      - .env
+      - mongo
     environment:
-      - MONGO_URI=mongodb://mongodb:27017/foodflow
-    networks:
-      - foodflow-network
+      - MONGO_URI=mongodb://mongo:27017/foodflow
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_EXPIRE=30d
+      - JWT_COOKIE_EXPIRE=30
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - NODE_ENV=production
+      - CLIENT_URL=http://56.228.12.101:3000
 
-  client:
-    build:
-      context: ./client
-      dockerfile: Dockerfile
-    container_name: foodflow-client
+  frontend:
+    image: harshittjainn/frontend:v2
+    container_name: food-app-frontend
     restart: unless-stopped
     ports:
       - "3000:80"
     depends_on:
-      - server
-    networks:
-      - foodflow-network
+      - backend
 
 volumes:
   mongodb_data:
-
-networks:
-  foodflow-network:
-    driver: bridge
