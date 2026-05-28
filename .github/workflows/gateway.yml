@@ -1,9 +1,9 @@
-name: Frontend CI/CD
+name: Gateway CI/CD
 
 on:
   push:
     paths:
-      - 'client/**'
+      - 'nginx/**'
     branches:
       - main
 
@@ -21,11 +21,11 @@ jobs:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
 
-    - name: Build Frontend Image
-      run: docker build -t harshittjainn/frontend:v2 ./client
+    - name: Build Gateway Image
+      run: docker build -t harshittjainn/gateway:v1 ./nginx
 
-    - name: Push Frontend Image
-      run: docker push harshittjainn/frontend:v2
+    - name: Push Gateway Image
+      run: docker push harshittjainn/gateway:v1
 
     - name: Deploy on EC2
       uses: appleboy/ssh-action@master
@@ -35,7 +35,7 @@ jobs:
         key: ${{ secrets.EC2_SSH_KEY }}
         script: |
           cd ~/food-app
-          docker pull harshittjainn/frontend:v2
+          docker pull harshittjainn/gateway:v1
           export JWT_SECRET="${{ secrets.JWT_SECRET }}"
           export OPENROUTER_API_KEY="${{ secrets.OPENROUTER_API_KEY }}"
-          docker compose up -d --no-deps frontend
+          docker compose up -d --no-deps gateway

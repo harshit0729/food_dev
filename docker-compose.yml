@@ -8,12 +8,59 @@ services:
     volumes:
       - mongodb_data:/data/db
 
-  backend:
-    image: harshittjainn/backend:v3
-    container_name: food-app-backend
+  auth-service:
+    image: harshittjainn/auth-service:v1
+    container_name: food-app-auth-service
     restart: unless-stopped
     ports:
-      - "5000:5000"
+      - "5001:5001"
+    depends_on:
+      - mongo
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/foodflow
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_EXPIRE=30d
+      - PORT=5001
+      - CLIENT_URL=http://56.228.12.101:3000
+
+  order-service:
+    image: harshittjainn/order-service:v1
+    container_name: food-app-order-service
+    restart: unless-stopped
+    ports:
+      - "5002:5002"
+    depends_on:
+      - mongo
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/foodflow
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_EXPIRE=30d
+      - PORT=5002
+      - NODE_ENV=production
+      - CLIENT_URL=http://56.228.12.101:3000
+
+  ai-service:
+    image: harshittjainn/ai-service:v1
+    container_name: food-app-ai-service
+    restart: unless-stopped
+    ports:
+      - "5003:5003"
+    depends_on:
+      - mongo
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/foodflow
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_EXPIRE=30d
+      - PORT=5003
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - AI_PROVIDER=openrouter
+      - NODE_ENV=production
+      - CLIENT_URL=http://56.228.12.101:3000
+
+  backend:
+    image: harshittjainn/backend:v4
+    container_name: food-app-backend
+    restart: unless-stopped
     depends_on:
       - mongo
     environment:
@@ -24,6 +71,19 @@ services:
       - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
       - NODE_ENV=production
       - CLIENT_URL=http://56.228.12.101:3000
+      - PORT=5000
+
+  gateway:
+    image: harshittjainn/gateway:v1
+    container_name: food-app-gateway
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    depends_on:
+      - auth-service
+      - order-service
+      - ai-service
+      - backend
 
   frontend:
     image: harshittjainn/frontend:v2
@@ -32,7 +92,7 @@ services:
     ports:
       - "3000:80"
     depends_on:
-      - backend
+      - gateway
 
 volumes:
   mongodb_data:

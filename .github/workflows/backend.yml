@@ -23,10 +23,10 @@ jobs:
         password: ${{ secrets.DOCKER_PASSWORD }}
 
     - name: Build Backend Image
-      run: docker build -f server/Dockerfile -t harshittjainn/backend:v3 .
+      run: docker build -f server/Dockerfile -t harshittjainn/backend:v4 .
 
     - name: Push Backend Image
-      run: docker push harshittjainn/backend:v3
+      run: docker push harshittjainn/backend:v4
 
     - name: Deploy on EC2
       uses: appleboy/ssh-action@master
@@ -34,16 +34,11 @@ jobs:
         host: ${{ secrets.EC2_HOST }}
         username: ${{ secrets.EC2_USER }}
         key: ${{ secrets.EC2_SSH_KEY }}
-
         script: |
           cd ~/food-app
-
-          docker pull harshittjainn/backend:v3
-          docker compose down
-
+          docker pull harshittjainn/backend:v4
           export JWT_SECRET="${{ secrets.JWT_SECRET }}"
           export OPENROUTER_API_KEY="${{ secrets.OPENROUTER_API_KEY }}"
-          docker compose up -d
-
+          docker compose up -d --no-deps backend
           sleep 5
-          docker exec food-app-backend-1 node server/seed.js || true
+          docker exec food-app-backend node server/seed.js || true
