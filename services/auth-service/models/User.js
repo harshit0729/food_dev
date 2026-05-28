@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-const JWT_SECRET = process.env.JWT_SECRET || 'DSY29QURD12R23TFNO1FFFTY13';
+const JWT_SECRET = process.env.JWT_SECRET || 'dev-jwt-secret-replace-in-production';
 
 const userSchema = new mongoose.Schema(
   {

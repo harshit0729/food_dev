@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ai-service
+  labels:
+    app: ai-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ai-service
+  template:
+    metadata:
+      labels:
+        app: ai-service
+    spec:
+      containers:
+      - name: ai-service
+        image: harshittjainn/ai-service:v1
+        ports:
+        - containerPort: 5003
+        env:
+        - name: PORT
+          value: "5003"
+        - name: MONGO_URI
+          valueFrom:
+            configMapKeyRef:
+              name: foodflow-config
+              key: MONGO_URI
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: foodflow-secrets
+              key: JWT_SECRET
+        - name: OPENROUTER_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: foodflow-secrets
+              key: OPENROUTER_API_KEY
+        - name: AI_PROVIDER
+          valueFrom:
+            configMapKeyRef:
+              name: foodflow-config
+              key: AI_PROVIDER
+        - name: NODE_ENV
+          valueFrom:
+            configMapKeyRef:
+              name: foodflow-config
+              key: NODE_ENV
+        - name: CLIENT_URL
+          valueFrom:
+            configMapKeyRef:
+              name: foodflow-config
+              key: CLIENT_URL

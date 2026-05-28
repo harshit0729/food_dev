@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const ErrorResponse = require('../utils/errorResponse');
 
-const JWT_SECRET = process.env.JWT_SECRET || 'DSY29QURD12R23TFNO1FFFTY13';
+const JWT_SECRET = process.env.JWT_SECRET || 'dev-jwt-secret-replace-in-production';
 
 exports.protect = async (req, res, next) => {
   let token;

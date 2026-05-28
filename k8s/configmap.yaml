@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: foodflow-config
+data:
+  NODE_ENV: "production"
+  MONGO_URI: "mongodb://mongo-service:27017/foodflow"
+  JWT_EXPIRE: "30d"
+  JWT_COOKIE_EXPIRE: "30"
+  AI_PROVIDER: "openrouter"
+  CLIENT_URL: "http://56.228.12.101:30080"
+  GATEWAY_URL: "http://56.228.12.101:30000"

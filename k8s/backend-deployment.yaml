@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  labels:
+    app: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+      - name: backend
+        image: harshittjainn/backend:v4
+        ports:
+        - containerPort: 5000
+        env:
+        - name: PORT
+          value: "5000"
+        - name: MONGO_URI
+          valueFrom:
+            configMapKeyRef:
+              name: foodflow-config
+              key: MONGO_URI
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: foodflow-secrets
+              key: JWT_SECRET
+        - name: JWT_EXPIRE
+          valueFrom:
+            configMapKeyRef:
+              name: foodflow-config
+              key: JWT_EXPIRE
+        - name: JWT_COOKIE_EXPIRE
+          valueFrom:
+            configMapKeyRef:
+              name: foodflow-config
+              key: JWT_COOKIE_EXPIRE
+        - name: OPENROUTER_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: foodflow-secrets
+              key: OPENROUTER_API_KEY
+        - name: NODE_ENV
+          valueFrom:
+            configMapKeyRef:
+              name: foodflow-config
+              key: NODE_ENV
+        - name: CLIENT_URL
+          valueFrom:
+            configMapKeyRef:
+              name: foodflow-config
+              key: CLIENT_URL

@@ -22,10 +22,10 @@ jobs:
         password: ${{ secrets.DOCKER_PASSWORD }}
 
     - name: Build Frontend Image
-      run: docker build -t harshittjainn/frontend:v2 ./client
+      run: docker build -t harshittjainn/frontend:v3 ./client
 
     - name: Push Frontend Image
-      run: docker push harshittjainn/frontend:v2
+      run: docker push harshittjainn/frontend:v3
 
     - name: Deploy on EC2
       uses: appleboy/ssh-action@master
@@ -35,7 +35,7 @@ jobs:
         key: ${{ secrets.EC2_SSH_KEY }}
         script: |
           cd ~/food-app
-          docker pull harshittjainn/frontend:v2
+          docker pull harshittjainn/frontend:v3
           export JWT_SECRET="${{ secrets.JWT_SECRET }}"
           export OPENROUTER_API_KEY="${{ secrets.OPENROUTER_API_KEY }}"
           docker compose up -d --no-deps frontend

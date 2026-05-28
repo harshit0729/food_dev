@@ -22,10 +22,10 @@ jobs:
         password: ${{ secrets.DOCKER_PASSWORD }}
 
     - name: Build Gateway Image
-      run: docker build -t harshittjainn/gateway:v1 ./nginx
+      run: docker build -t harshittjainn/gateway:v2 ./nginx
 
     - name: Push Gateway Image
-      run: docker push harshittjainn/gateway:v1
+      run: docker push harshittjainn/gateway:v2
 
     - name: Deploy on EC2
       uses: appleboy/ssh-action@master
@@ -35,7 +35,7 @@ jobs:
         key: ${{ secrets.EC2_SSH_KEY }}
         script: |
           cd ~/food-app
-          docker pull harshittjainn/gateway:v1
+          docker pull harshittjainn/gateway:v2
           export JWT_SECRET="${{ secrets.JWT_SECRET }}"
           export OPENROUTER_API_KEY="${{ secrets.OPENROUTER_API_KEY }}"
-          docker compose up -d --no-deps gateway
+          docker compose up -d --no-deps gateway-service
